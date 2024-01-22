@@ -2,7 +2,11 @@ from dataclasses import dataclass
 
 from typing import List, Dict
 
+from rich.table import Table
+
 from IntrigueWeb.relations import RelationSet
+from rich import print as rprint
+
 
 class Person(object):
 
@@ -13,6 +17,33 @@ class Person(object):
         self._relations = RelationSet()
         self._owed_favours: Dict[str, int] = {}
         self._owed_hooks: Dict[str, int] = {}
+
+    HELP = """
+A person has three pieces of identifying information:
+1. The name of the person
+2. The renown of the person
+3. The affiliation of the person
+
+They can also be owed favours and hooks by other people.   
+
+When you show a person's information, you will see that person's information, as well as their relationships/favours owed to them by other people.
+
+This table has the form 
+
+┏━━━━━━━━┳━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Name   ┃ Pull ┃ Opinion ┃ Favours Owed ┃ Hooks Owed ┃
+┡━━━━━━━━╇━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ Joseph │ 0.9  │ 10      │ 0            │ 0          │
+└────────┴──────┴─────────┴──────────────┴────────────┘
+
+ - 'Pull' is the pull of the person on Name,
+ - 'Opinion' is the option of Name about the person
+ - 'Favours/Hooks Owed' is the number of favours/hooks owed by Name to the person 
+
+A dash in the pull and opinion column indicates there is no known relation between the parties. 
+
+    see also [favours]
+        """
 
 
 
@@ -61,6 +92,33 @@ class Person(object):
             self._owed_favours[target] -= number
 
         return
+
+    def print_relations(self):
+
+        table = Table(show_header=True, title="Relations")
+        table.add_column("Name")
+        table.add_column("Pull")
+        table.add_column("Opinion")
+        table.add_column("Favours Owed")
+        table.add_column("Hooks Owed")
+
+        for person in self.relations:
+            table.add_row(*[person, str(self.relations[person].pull), str(self.relations[person].opinion),
+                       str(self._owed_favours[person]) if person in self._owed_favours else '0',
+                       str(self._owed_hooks[person]) if person in self._owed_hooks else '0'])
+
+        for person in self._owed_favours:
+            if person not in self.relations:
+                table.add_row(*[person, '-', '-',
+                                str(self._owed_favours[person]) if person in self._owed_favours else '0',
+                                str(self._owed_hooks[person]) if person in self._owed_hooks else '0'])
+
+        for person in self._owed_hooks:
+            if person not in self.relations and person not in self._owed_favours:
+                table.add_row(*[person, '-', '-', '0',
+                                str(self._owed_hooks[person]) if person in self._owed_hooks else '0'])
+
+        rprint(table)
 
 
 class PersonSet(Dict[str, Person]):

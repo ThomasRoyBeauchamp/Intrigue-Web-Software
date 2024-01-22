@@ -15,6 +15,7 @@ class Web:
     def members(self):
         return self._members
 
+
     @property
     def name(self):
         return self._name
@@ -26,7 +27,7 @@ class Web:
             else:
                 print(f"Name: {name}")
             if renown is None:
-                renown = int(input("Renown: ").strip()),
+                renown = int(input("Renown: ").strip())
             else:
                 print(f"Renown: {renown}")
             if affiliation is None:
@@ -42,24 +43,25 @@ class Web:
             match decision:
                 case 'Y':
                     self._members[new_member.name] = new_member
+                    print(f"Added {new_member.name}")
                     return
                 case 'R':
                     continue
                 case _:
+                    print('Cancelling...')
                     return
-
-
-
-
 
     def add_relation(self):
 
         while True:
             source = input("Source: ")
             target = input("Target: ")
+
             if source not in self.members:
                 decision = input(f"{source} is not known. Would you like to add them (Y), "
-                                 f"Restart(R) or Cancel (N): ")[0].upper()
+                                 f"Restart(R) or Cancel (N): ")
+                decision = decision[0].upper() if decision != '' else ''
+
                 match decision:
                     case 'Y':
                         self.add_member(name=source)
@@ -115,16 +117,105 @@ class Web:
 
             new_relation = Relation(pull=pull, opinion=opinion)
 
-            decision = decision = input(f"Adding relation: {new_relation} from {source} to {target}. Continue (Y), Restart (R) or "
+
+
+            decision = input(f"Adding relation: {new_relation} from {source} to {target}. Continue (Y), Restart (R) or "
+                                        f"cancel (N): ")[0].upper() if old_relation is None else input(f"Replacing relation {old_relation} from {source} to {target} with {new_relation}. Continue (Y), Restart (R) or "
                                         f"cancel (N): ")[0].upper()
             match decision:
                 case 'Y':
                     self.members[source].relations[target] = new_relation
                     return
                 case 'R':
+                    self.members[source].relations[target] = old_relation
+                    continue
+                case _:
+                    self.members[source].relations[target] = old_relation
+                    return
+
+    def add_favours(self):
+
+        while True:
+            source = input("Favours owed to: ")
+            target = input("Favours owed by: ")
+            if source not in self.members:
+                decision = input(f"{source} is not known. Would you like to add them (Y), "
+                                 f"Restart(R) or Cancel (N): ")[0].upper()
+                match decision:
+                    case 'Y':
+                        self.add_member(name=source)
+
+                    case 'R':
+                        continue
+                    case _:
+                        return
+            if target not in self.members:
+                decision = input(f"{target} is not known. Would you like to add them (Y), "
+                                 f"Restart(R) or Cancel (N): ")[0].upper()
+                match decision:
+                    case 'Y':
+                        self.add_member(name=target)
+                    case 'R':
+                        continue
+                    case _:
+                        return
+
+            while True:
+                try:
+                    fta = int(input(f"Number to add: ").strip())
+                    if 0 <= fta:
+                        raise ValueError
+                    break
+                except ValueError:
+                    print("Please enter a valid positive integer")
+                    continue
+
+            decision = input(f"Adding {fta} favours owed by {target} to {source}. Would you like to add them (Y), "
+                             f"Restart(R) or Cancel (N): ")[0].upper()
+            match decision:
+                case 'Y':
+                    self.members[source].add_favours(target, fta)
+                case 'R':
                     continue
                 case _:
                     return
+
+    def remove_favours(self):
+
+        while True:
+            source = input("Favours owed to: ")
+            target = input("Favours owed by: ")
+            if source not in self.members:
+                print(f"{source} is not known")
+                return
+
+            if target not in self.members:
+                print(f"{target} is not known")
+                return
+
+            while True:
+                try:
+                    fta = int(input(f"Number to remove: ").strip())
+                    if 0 <= fta:
+                        raise ValueError
+                    break
+                except ValueError:
+                    print("Please enter a valid positive integer")
+                    continue
+
+            decision = input(f"Removing {fta} favours owed by {target} to {source}. Would you like to continue (Y), "
+                             f"Restart(R) or Cancel (N): ")[0].upper()
+            match decision:
+                case 'Y':
+                    self.members[source].remove_favours(target, fta)
+                case 'R':
+                    continue
+                case _:
+                    return
+
+
+
+
 
 
 
