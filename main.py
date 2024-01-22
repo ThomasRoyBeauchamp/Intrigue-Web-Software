@@ -31,6 +31,8 @@ if __name__ == '__main__':
             web = Web(input("Enter name for IntrigueWeb: ").strip())
             break
 
+    print("Welcome to the IntrigueWeb software v0.1. Type 'help' for a list of commands.")
+
     while True:
 
         new_command = input(f"IntrigueWeb({web.name})>>>").split(' ')
