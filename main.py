@@ -3,6 +3,8 @@
 from IntrigueWeb import Web, Relation
 from IntrigueWeb.people import Person
 
+from rich import print
+
 import pickle
 import os
 
@@ -46,6 +48,8 @@ if __name__ == '__main__':
                         web.add_relation()
                     case 'favours' | 'favour':
                         web.add_favours()
+                    case 'hook' | 'hooks':
+                        web.add_hooks()
                     case _:
                         print(f"Command {' '.join(new_command)} not known")
 
@@ -53,6 +57,8 @@ if __name__ == '__main__':
                 match new_command[1]:
                     case 'favours' | 'favour':
                         web.remove_favours()
+                    case 'hooks' | 'hook':
+                        web.remove_hooks()
                     case _:
                         print(f"Command {' '.join(new_command)} not known")
 
@@ -67,10 +73,15 @@ if __name__ == '__main__':
                 else:
                     print(f"No such person {person}")
 
+            case 'influenceplay':
+                web.make_influence_play()
+
             case 'exit':
                 if input("Do you want to save? (Y/N): ").upper() == 'Y':
                     if load_file == '':
                         load_file = 'Webs/'+input(f'Enter file name for IntrigueWeb {web.name}: Webs/')
+                        if not os.path.isdir('Webs'):
+                            os.makedirs('Webs')
 
                     with open(load_file, 'wb') as F:
                         pickle.dump(web, F)
@@ -82,6 +93,8 @@ if __name__ == '__main__':
             case 'save':
                 if load_file == '':
                     load_file = 'Webs/' + input(f'Enter file name for IntrigueWeb {web.name}: Webs/')
+                    if not os.path.isdir('Webs'):
+                        os.makedirs('Webs')
 
                 with open(load_file, 'wb') as F:
                     pickle.dump(web, F)
@@ -96,16 +109,16 @@ if __name__ == '__main__':
     
     You can use the following commands to manage your web:
     
-    help [|person|relation]:
+    help [|person|relation]
         This launches this dialog if topic is blank, otherwise it will show the help for the specified topic.
     
-    add [person|relation|favour(s)]:
+    add [person|relation|favour(s)|hook(s)]
         This launches the dialog to add a person, relation or favours to your web
         
-    remove [favours]:
+    remove [favours]
         This launches the dialog to remove favours from your web
         
-    members:
+    members
         This prints a list of all people currently in the web
     
     show [member]

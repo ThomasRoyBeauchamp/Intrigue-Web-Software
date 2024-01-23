@@ -63,11 +63,18 @@ A dash in the pull and opinion column indicates there is no known relation betwe
     def relations(self):
         return self._relations
 
+    @property
+    def owed_favours(self):
+        return self._owed_favours
+
+    def owed_hooks(self):
+        return self._owed_hooks
+
     def __str__(self):
         return f"\n\tName: {self.name}\n\tRenown: {self.renown}\n\tAffiliation: {self.affiliation}\n"
 
     def __repr__(self):
-        return f"Person(name='{self.name}', renown={self.renown}, affiliation='{self.affiliation})'"
+        return f"Person(name='{self.name}', renown={self.renown}, affiliation='{self.affiliation}')"
 
     def add_favours(self, target: str, number: int):
         if number < 0:
@@ -90,6 +97,30 @@ A dash in the pull and opinion column indicates there is no known relation betwe
             self._owed_favours.pop(target)
         else:
             self._owed_favours[target] -= number
+
+        return
+
+    def add_hooks(self, target: str, number: int):
+        if number < 0:
+            raise ValueError
+
+        if target in self._owed_favours:
+            self._owed_hooks[target] += number
+
+        else:
+            self._owed_hooks[target] = number
+
+    def remove_hooks(self, target: str, number: int):
+        if number < 0:
+            raise ValueError
+
+        if target not in self._owed_hooks:
+            return
+
+        if number >= self._owed_favours[target]:
+            self._owed_hooks.pop(target)
+        else:
+            self._owed_hooks[target] -= number
 
         return
 
